@@ -5,10 +5,12 @@ from rest_framework import status
 from .models import Movie
 from .serializers import MovieSerializer
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # Create your views here.
 
 class MovieListCreateView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)

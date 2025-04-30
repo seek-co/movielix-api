@@ -33,6 +33,7 @@ class Movie(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_by")
     created_at = models.DateTimeField(auto_now_add=True)
     tags = models.ManyToManyField(Tag, related_name='movies', blank=True)
+    duration = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
         return f"{self.title}{f' - ({self.release_year})' if self.release_year else ''}"
@@ -46,7 +47,7 @@ class Watchlist(models.Model):
 class MovieStatus(models.Model):
     wacthlist = models.OneToOneField(Watchlist, on_delete=models.CASCADE, related_name="status")
     watched = models.BooleanField(default=False)
-    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)], blank=True, null=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(10.0)])
     review = models.TextField(blank=True)
 
     def __str__(self):
@@ -57,8 +58,8 @@ class MovieStatus(models.Model):
         return f"{watched_status} | {rating_status} | {review_status}"
 
 WATCH_LOCATIONS = (
-    ("c", "Cinema"),
     ("h", "Home"),
+    ("c", "Cinema"),
     ("o", "Other"),
 )
 
@@ -72,9 +73,9 @@ WATCH_WITH = (
 
 class Note(models.Model):
     wacthlist = models.OneToOneField(Watchlist, on_delete=models.CASCADE, related_name="note")
-    watch_date = models.DateField(blank=True, null=True)
-    watch_location = models.CharField(max_length=1, choices=WATCH_LOCATIONS, blank=True, null=True)
-    watch_with = models.CharField(max_length=1, choices=WATCH_WITH, blank=True, null=True)
+    watch_date = models.DateField()
+    watch_location = models.CharField(max_length=1, choices=WATCH_LOCATIONS, default=WATCH_LOCATIONS[0][0])
+    watch_with = models.CharField(max_length=1, choices=WATCH_WITH ,default=WATCH_WITH[0][0])
 
     def __str__(self):
         date_str = self.watch_date if self.watch_date else 'Unknown'
