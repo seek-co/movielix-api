@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('added_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='movies_added', to=settings.AUTH_USER_MODEL)),
-                ('genres', models.ManyToManyField(related_name='movies', to='movielix.genre')),
+                ('genres', models.ManyToManyField(blank=True, related_name='movies', to='movielix.genre')),
             ],
             options={
                 'ordering': ['created_at'],

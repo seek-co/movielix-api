@@ -149,3 +149,40 @@ class WatchlistByCollectionView(APIView):
         watchlist = Watchlist.objects.filter(collection_id=collection_id).select_related("movie")
         serializer = WatchlistSerializer(watchlist, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, collection_id):
+        movie_id = request.data.get("movie_id")
+        if not movie_id:
+            return Response({"error": "movie_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            movie = Movie.objects.get(id=movie_id)
+        except Movie.DoesNotExist:
+            return Response({"error": "Movie does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if Watchlist.objects.filter(collection_id=collection_id, movie_id=movie_id).exists():
+            return Response({"error": "Movie already in collection"}, status=status.HTTP_400_BAD_REQUEST)
+
+        watchlist = Watchlist.objects.create(collection_id=collection_id, movie=movie)
+        serializer = WatchlistSerializer(watchlist)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    
+class WatchlistDetailView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, collection_id, movie_id):
+        watchlist = get_object_or_404(
+            Watchlist.objects.select_related("movie", "collection"),
+            collection_id=collection_id,
+            movie_id=movie_id
+        )
+        serializer = WatchlistSerializer(watchlist)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, collection_id, movie_id):
+        try:
+            watchlist = Watchlist.objects.get(collection_id=collection_id, movie_id=movie_id)
+            watchlist.delete()
+            return Response({"message": "Movie removed from collection"}, status=status.HTTP_204_NO_CONTENT)
+        except Watchlist.DoesNotExist:
+            return Response({"error": "Movie not found in collection"}, status=status.HTTP_404_NOT_FOUND)

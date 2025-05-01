@@ -50,7 +50,7 @@ class Movie(models.Model):
     release_year = models.PositiveIntegerField(blank=True, null=True)
     poster_url = models.CharField(max_length=500, blank=True)
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="movies_added")
-    genres = models.ManyToManyField(Genre, related_name="movies")
+    genres = models.ManyToManyField(Genre, related_name="movies", blank=True)
     duration = models.CharField(max_length=20, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
