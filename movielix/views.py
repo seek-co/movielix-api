@@ -138,9 +138,14 @@ class GenreListView(APIView):
 
 class WatchlistView(APIView):
     permission_classes = [AllowAny]
-
     def get(self, request):
         watchlists = Watchlist.objects.all().select_related("movie", "collection")
         serializer = WatchlistSerializer(watchlists, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+class WatchlistByCollectionView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, collection_id):
+        watchlist = Watchlist.objects.filter(collection_id=collection_id).select_related("movie")
+        serializer = WatchlistSerializer(watchlist, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
