@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Movie, Tag
-from .serializers import MovieSerializer, TagSerializer
+from .models import Movie, Tag, Collection
+from .serializers import MovieSerializer, TagSerializer, CollectionSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
@@ -87,3 +87,18 @@ class TagDetailView(APIView):
         tag.movies.clear()
         tag.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class CollectionListCreateView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request):
+        movies = Collection.objects.all()
+        serializer = CollectionSerializer(movies, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = CollectionSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
