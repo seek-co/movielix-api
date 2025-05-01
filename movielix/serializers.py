@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Tag, Collection, Genre
+from .models import Movie, Tag, Collection, Genre, Watchlist
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,10 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = '__all__'
+
+class WatchlistSerializer(serializers.ModelSerializer):
+    movie_title = serializers.CharField(source="movie.title", read_only=True)
+    collection_title = serializers.CharField(source="collection.title", read_only=True)
+    class Meta:
+        model = Watchlist
+        fields = ["id", "collection", "collection_title", "movie", "movie_title", "created_at", "updated_at"]

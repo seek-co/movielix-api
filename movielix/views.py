@@ -2,15 +2,15 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Movie, Tag, Collection, Genre
-from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer
+from .models import Movie, Tag, Collection, Genre, Watchlist
+from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer, WatchlistSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
-class MovieListCreateView(APIView):
+class MovieListView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         movies = Movie.objects.all()
@@ -48,7 +48,7 @@ class MovieDetailView(APIView):
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class TagListCreateView(APIView):
+class TagListView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         tags = Tag.objects.all()
@@ -89,7 +89,7 @@ class TagDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     
-class CollectionListCreateView(APIView):
+class CollectionListView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         movies = Collection.objects.all()
@@ -128,10 +128,19 @@ class CollectionDetailView(APIView):
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    
 class GenreListView(APIView):
     permission_classes = [AllowAny]
     def get(self, request):
         genres = Genre.objects.all()
         serializer = GenreSerializer(genres, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class WatchlistView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        watchlists = Watchlist.objects.all().select_related("movie", "collection")
+        serializer = WatchlistSerializer(watchlists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
