@@ -36,7 +36,7 @@ class Movie(models.Model):
     duration = models.CharField(max_length=20, blank=True)
 
     def __str__(self):
-        return f"{self.title}{f' - ({self.release_year})' if self.release_year else ''}"
+        return f"{self.title}{f' ({self.release_year})' if self.release_year else ''}"
 
 
 class Watchlist(models.Model):
