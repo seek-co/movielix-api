@@ -12,9 +12,9 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
-
+    
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
 
 class Collection(models.Model):
@@ -31,13 +31,18 @@ class Collection(models.Model):
         return f"{self.title} ({'Public' if self.is_public else 'Private'})"
     
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
 class Genre(models.Model):
     name = models.CharField(max_length=30, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        ordering = ["created_at"]
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
@@ -54,7 +59,7 @@ class Movie(models.Model):
         return f"{self.title}{f' ({self.release_year})' if self.release_year else ''}"
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
 
 class Watchlist(models.Model):
@@ -64,7 +69,7 @@ class Watchlist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
         
 
 class MovieReview(models.Model):
@@ -79,7 +84,7 @@ class MovieReview(models.Model):
         return f"Review for {self.movie.title} by {self.user.username}"
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
 class MovieStatus(models.Model):
     WATCH_STATUS_CHOICES = [
@@ -107,7 +112,7 @@ class MovieStatus(models.Model):
         return f"{status_label} | {rating_status}"
     
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
 
 
 class Favorite(models.Model):
@@ -120,4 +125,4 @@ class Favorite(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["user", "collection"], name="unique_user_collection_favorite")
         ]
-        ordering = ["-created_at"]
+        ordering = ["created_at"]

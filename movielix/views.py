@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Movie, Tag, Collection
-from .serializers import MovieSerializer, TagSerializer, CollectionSerializer
+from .models import Movie, Tag, Collection, Genre
+from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
@@ -127,3 +127,11 @@ class CollectionDetailView(APIView):
         collection = self.get_object(pk)
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class GenreListView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request):
+        genres = Genre.objects.all()
+        serializer = GenreSerializer(genres, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
