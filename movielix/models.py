@@ -2,123 +2,122 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-
 # Create your models here.
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="tags_added")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-    
     def __str__(self):
         return self.name
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
 
 
 class Collection(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="collections")
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    tags = models.ManyToManyField(Tag, related_name='collections', blank=True)
+    tags = models.ManyToManyField(Tag, related_name="collections", blank=True)
     is_public = models.BooleanField(default=False)
     url = models.CharField(max_length=500, unique=True, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.title} ({'Public' if self.is_public else 'Private'})"
     
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
 
+class Genre(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+
+    def __str__(self):
+        return self.name
 
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     overview  = models.TextField(blank=True)
     release_year = models.PositiveIntegerField(blank=True, null=True)
     poster_url = models.CharField(max_length=500, blank=True)
-    added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="added_by")
-    created_at = models.DateTimeField(auto_now_add=True)
-    tags = models.ManyToManyField(Tag, related_name='movies', blank=True)
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="movies_added")
+    genres = models.ManyToManyField(Genre, related_name="movies")
     duration = models.CharField(max_length=20, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.title}{f' ({self.release_year})' if self.release_year else ''}"
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
 
 
 class Watchlist(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name="wacthlists")
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
+        
 
-
-
-class MovieStatus(models.Model):
-    wacthlist = models.OneToOneField(Watchlist, on_delete=models.CASCADE, related_name="status")
-    watched = models.BooleanField(default=False)
-    rating = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(10.0)])
+class MovieReview(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="movie_reviews")
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     review = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        watched_status = "Watched" if self.watched else "Not Watched"
-        rating_status = f"Rating: {self.rating}" if self.rating else "No Rating"
-        review_status = f"Review: {self.review[:50]}..." if self.review else "No Review"
-        
-        return f"{watched_status} | {rating_status} | {review_status}"
-    
+        return f"Review for {self.movie.title} by {self.user.username}"
+
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
 
-WATCH_LOCATIONS = (
-    ("h", "Home"),
-    ("c", "Cinema"),
-    ("o", "Other"),
-)
+class MovieStatus(models.Model):
+    WATCH_STATUS_CHOICES = [
+        ("want_to_watch", "Want to Watch"),
+        ("watching", "Watching"),
+        ("completed", "Completed"),
+    ]
 
-WATCH_WITH = (
-    ("a", "Alone"),
-    ("r", "Friends Night"),
-    ("m", "Family Night"),
-    ("o", "Other"),
-)
+    watchlist = models.OneToOneField(Watchlist, on_delete=models.CASCADE, related_name="status")
+    status = models.CharField(max_length=20, choices=WATCH_STATUS_CHOICES, default="want_to_watch")
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True, null=True)
+    date_watched = models.DateField(null=True, blank=True)
 
+    watch_location = models.CharField(max_length=100, blank=True, null=True)
+    watched_with = models.CharField(max_length=100, blank=True, null=True)
+    mood = models.CharField(max_length=100, blank=True, null=True)
+    thoughts = models.TextField(blank=True, null=True)
 
-class Note(models.Model):
-    wacthlist = models.OneToOneField(Watchlist, on_delete=models.CASCADE, related_name="note")
-    watch_date = models.DateField()
-    watch_location = models.CharField(max_length=1, choices=WATCH_LOCATIONS, default=WATCH_LOCATIONS[0][0])
-    watch_with = models.CharField(max_length=1, choices=WATCH_WITH ,default=WATCH_WITH[0][0])
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        date_str = self.watch_date if self.watch_date else 'Unknown'
-        location_str = self.get_watch_location_display() if self.watch_location else 'Unknown'
-        with_str = self.get_watch_with_display() if self.watch_with else 'Unknown'
-        
-        return f"Watch date: {date_str}, Location: {location_str}, Watch with: {with_str}"
+        status_label = self.get_status_display()
+        rating_status = f"Rating: {self.rating} stars" if self.rating else "No Rating"
+        return f"{status_label} | {rating_status}"
     
     class Meta:
-        ordering = ["-id"]
+        ordering = ["-created_at"]
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorites")
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["user", "collection"], name="unique_user_collection_favorite")
         ]
-        ordering = ["-id"]
+        ordering = ["-created_at"]
