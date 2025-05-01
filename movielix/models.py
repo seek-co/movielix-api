@@ -7,9 +7,14 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
     
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["-id"]
 
 
 class Collection(models.Model):
@@ -23,6 +28,9 @@ class Collection(models.Model):
 
     def __str__(self):
         return f"{self.title} ({'Public' if self.is_public else 'Private'})"
+    
+    class Meta:
+        ordering = ["-id"]
 
 
 class Movie(models.Model):
@@ -38,10 +46,18 @@ class Movie(models.Model):
     def __str__(self):
         return f"{self.title}{f' ({self.release_year})' if self.release_year else ''}"
 
+    class Meta:
+        ordering = ["-id"]
+
 
 class Watchlist(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name="wacthlists")
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-id"]
+
 
 
 class MovieStatus(models.Model):
@@ -49,6 +65,8 @@ class MovieStatus(models.Model):
     watched = models.BooleanField(default=False)
     rating = models.DecimalField(max_digits=3, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(10.0)])
     review = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         watched_status = "Watched" if self.watched else "Not Watched"
@@ -56,6 +74,9 @@ class MovieStatus(models.Model):
         review_status = f"Review: {self.review[:50]}..." if self.review else "No Review"
         
         return f"{watched_status} | {rating_status} | {review_status}"
+    
+    class Meta:
+        ordering = ["-id"]
 
 WATCH_LOCATIONS = (
     ("h", "Home"),
@@ -76,6 +97,8 @@ class Note(models.Model):
     watch_date = models.DateField()
     watch_location = models.CharField(max_length=1, choices=WATCH_LOCATIONS, default=WATCH_LOCATIONS[0][0])
     watch_with = models.CharField(max_length=1, choices=WATCH_WITH ,default=WATCH_WITH[0][0])
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         date_str = self.watch_date if self.watch_date else 'Unknown'
@@ -83,13 +106,19 @@ class Note(models.Model):
         with_str = self.get_watch_with_display() if self.watch_with else 'Unknown'
         
         return f"Watch date: {date_str}, Location: {location_str}, Watch with: {with_str}"
+    
+    class Meta:
+        ordering = ["-id"]
 
 
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="favorites")
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=["user", "collection"], name="unique_user_collection_favorite")
         ]
+        ordering = ["-id"]
