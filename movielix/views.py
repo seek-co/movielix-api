@@ -2,8 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Movie, Tag, Collection, Genre, Watchlist
-from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer, WatchlistSerializer
+from .models import Movie, Tag, Collection, Genre, Watchlist, MovieReview
+from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer, WatchlistSerializer, MovieReviewSerializer
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
@@ -186,3 +186,22 @@ class WatchlistDetailView(APIView):
             return Response({"message": "Movie removed from collection"}, status=status.HTTP_204_NO_CONTENT)
         except Watchlist.DoesNotExist:
             return Response({"error": "Movie not found in collection"}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+class MovieReviewListView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, movie_id):
+        movie = get_object_or_404(Movie, id=movie_id)
+        reviews = MovieReview.objects.filter(movie_id=movie_id).select_related("user")
+        serializer = MovieReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, movie_id):
+        movie = get_object_or_404(Movie, id=movie_id)
+        if MovieReview.objects.filter(movie_id=movie_id, user=request.data.get("user")).exists():
+            return Response({"error": "You have already reviewed this movie."}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = MovieReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
