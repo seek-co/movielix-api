@@ -11,6 +11,7 @@ from .views import (
     WatchlistByCollectionView,
     WatchlistDetailView,
     MovieReviewListView,
+    MovieReviewDetailView,
 )
 
 
@@ -26,4 +27,5 @@ urlpatterns = [
     path("collections/<int:collection_id>/watchlist/", WatchlistByCollectionView.as_view(), name="collection-watchlist"),
     path("collections/<int:collection_id>/movie/<int:movie_id>/", WatchlistDetailView.as_view(), name="collection-watchlist-movie"),
     path("movies/<int:movie_id>/reviews/", MovieReviewListView.as_view(), name="moive-review"),
+    path("movies/<int:movie_id>/reviews/<int:review_id>/", MovieReviewDetailView.as_view(), name="movie-review-detail"),
 ]

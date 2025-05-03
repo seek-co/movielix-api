@@ -198,10 +198,34 @@ class MovieReviewListView(APIView):
 
     def post(self, request, movie_id):
         movie = get_object_or_404(Movie, id=movie_id)
-        if MovieReview.objects.filter(movie_id=movie_id, user=request.data.get("user")).exists():
+        user_id = request.data.get("user")
+        if not user_id:
+            return Response({"error": "user is required"}, status=status.HTTP_400_BAD_REQUEST)
+        if MovieReview.objects.filter(movie_id=movie_id, user=user_id).exists():
             return Response({"error": "You have already reviewed this movie."}, status=status.HTTP_400_BAD_REQUEST)
         serializer = MovieReviewSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(movie=movie)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class MovieReviewDetailView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, movie_id, review_id):
+        review = get_object_or_404(MovieReview, id=review_id, movie_id=movie_id)
+        serializer = MovieReviewSerializer(review)
+        return Response(serializer.data)
+
+    def patch(self, request, movie_id, review_id):
+        review = get_object_or_404(MovieReview, id=review_id, movie_id=movie_id)
+        serializer = MovieReviewSerializer(review, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, movie_id, review_id):
+        review = get_object_or_404(MovieReview, id=review_id, movie_id=movie_id)
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
