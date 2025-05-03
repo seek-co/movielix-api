@@ -2,11 +2,15 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Movie, Tag, Collection, Genre, Watchlist, MovieReview
-from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer, WatchlistSerializer, MovieReviewSerializer
-from rest_framework.decorators import api_view
+from .models import Movie, Tag, Collection, Genre, Watchlist, MovieReview, Favorite
+from .serializers import MovieSerializer, TagSerializer, CollectionSerializer, GenreSerializer, WatchlistSerializer, MovieReviewSerializer, FavoriteSerializer
+from django.contrib.auth.password_validation import validate_password
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.core.exceptions import ValidationError
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+
 
 # Create your views here.
 
@@ -154,11 +158,8 @@ class WatchlistByCollectionView(APIView):
         movie_id = request.data.get("movie_id")
         if not movie_id:
             return Response({"error": "movie_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            movie = Movie.objects.get(id=movie_id)
-        except Movie.DoesNotExist:
-            return Response({"error": "Movie does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        
+        movie = get_object_or_404(Movie, id=movie_id)
 
         if Watchlist.objects.filter(collection_id=collection_id, movie_id=movie_id).exists():
             return Response({"error": "Movie already in collection"}, status=status.HTTP_400_BAD_REQUEST)
@@ -229,3 +230,32 @@ class MovieReviewDetailView(APIView):
         review = get_object_or_404(MovieReview, id=review_id, movie_id=movie_id)
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+    
+class SignUpView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        username = request.data.get("username")
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        try:
+            validate_password(password)
+        except ValidationError as err:
+            return Response({"error": err.messages}, status=400)
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        tokens = RefreshToken.for_user(user)
+        return Response(
+            {
+                "refresh": str(tokens),
+                "access": str(tokens.access_token)
+            },
+            status=status.HTTP_201_CREATED
+        )

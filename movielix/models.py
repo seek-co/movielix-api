@@ -70,7 +70,10 @@ class Watchlist(models.Model):
 
     class Meta:
         ordering = ["created_at"]
-        
+
+    def __str__(self):
+        return f"Watchlist for {self.collection.user.username} — Collection: '{self.collection.title}' — Movie: '{self.movie.title}'"
+ 
 
 class MovieReview(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
@@ -126,3 +129,6 @@ class Favorite(models.Model):
             models.UniqueConstraint(fields=["user", "collection"], name="unique_user_collection_favorite")
         ]
         ordering = ["created_at"]
+        
+    def __str__(self):
+        return f"{self.user.username} favorited Collection:{self.collection.title}"

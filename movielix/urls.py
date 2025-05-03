@@ -12,7 +12,10 @@ from .views import (
     WatchlistDetailView,
     MovieReviewListView,
     MovieReviewDetailView,
+    SignUpView,
 )
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 
 
 urlpatterns = [
@@ -28,4 +31,7 @@ urlpatterns = [
     path("collections/<int:collection_id>/movie/<int:movie_id>/", WatchlistDetailView.as_view(), name="collection-watchlist-movie"),
     path("movies/<int:movie_id>/reviews/", MovieReviewListView.as_view(), name="moive-review"),
     path("movies/<int:movie_id>/reviews/<int:review_id>/", MovieReviewDetailView.as_view(), name="movie-review-detail"),
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("signup/", SignUpView.as_view(), name="signup"),
 ]
