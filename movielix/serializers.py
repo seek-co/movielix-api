@@ -12,9 +12,16 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class CollectionSerializer(serializers.ModelSerializer):
+    is_favorite = serializers.SerializerMethodField()
     class Meta:
         model = Collection
         fields = '__all__'
+        
+    def get_is_favorite(self, obj):
+        user = self.context.get('user')
+        if user and not user.is_anonymous:
+            return obj.favorites.filter(user=user).exists()
+        return False
         
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:

@@ -94,10 +94,11 @@ class TagDetailView(APIView):
     
     
 class CollectionListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        movies = Collection.objects.all()
-        serializer = CollectionSerializer(movies, many=True)
+        user = request.user 
+        collections = Collection.objects.filter(user=user)
+        serializer = CollectionSerializer(collections, many=True, context={"user": request.user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
