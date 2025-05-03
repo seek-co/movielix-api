@@ -13,6 +13,7 @@ from .views import (
     MovieReviewListView,
     MovieReviewDetailView,
     FavoriteListView,
+    FavoriteDetailView,
     SignUpView,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -33,6 +34,7 @@ urlpatterns = [
     path("movies/<int:movie_id>/reviews/", MovieReviewListView.as_view(), name="moive-review"),
     path("movies/<int:movie_id>/reviews/<int:review_id>/", MovieReviewDetailView.as_view(), name="movie-review-detail"),
     path("favorites/", FavoriteListView.as_view(), name="favorite-list"),
+    path("favorites/<int:collection_id>/", FavoriteDetailView.as_view(), name="favorite-detail"),
     path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("signup/", SignUpView.as_view(), name="signup"),

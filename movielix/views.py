@@ -257,6 +257,21 @@ class FavoriteListView(APIView):
             return Response({"message": "Added to favorites"}, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "Already in favorites"}, status=status.HTTP_200_OK)
+        
+class FavoriteDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, collection_id):
+        user = request.user
+        favorite = get_object_or_404(Favorite, user=user, collection__id=collection_id)
+        serializer = FavoriteSerializer(favorite)
+        return Response(serializer.data)
+
+    def delete(self, request, collection_id):
+        user = request.user
+        favorite = get_object_or_404(Favorite, user=user, collection__id=collection_id)
+        favorite.delete()
+        return Response({"detail": "Favorite removed."}, status=status.HTTP_204_NO_CONTENT)
     
 class SignUpView(APIView):
     permission_classes = [AllowAny]
