@@ -38,9 +38,8 @@ class MovieReviewSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    collection_title = serializers.CharField(source="collection.title", read_only=True)
-    collection_owner = serializers.CharField(source="collection.user.username", read_only=True)
+    collection = CollectionSerializer()
 
     class Meta:
         model = Favorite
-        fields = ["id", "collection", "collection_title", "collection_owner", "created_at", "updated_at"]
+        fields = '__all__'

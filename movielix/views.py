@@ -231,7 +231,31 @@ class MovieReviewDetailView(APIView):
         review.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    
+class FavoriteListView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        favorites = Favorite.objects.filter(user=request.user)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user = request.user
+        collection_id = request.data.get("collection")
+
+        if not collection_id:
+            return Response({"detail": "Collection ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        collection = get_object_or_404(Collection, id=collection_id)
+
+        if collection.user != user and not collection.is_public:
+            return Response({"detail": "You cannot favorite this private collection."}, status=status.HTTP_403_FORBIDDEN)
+
+        favorite, created = Favorite.objects.get_or_create(user=user, collection=collection)
+
+        if created:
+            return Response({"message": "Added to favorites"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"message": "Already in favorites"}, status=status.HTTP_200_OK)
     
 class SignUpView(APIView):
     permission_classes = [AllowAny]
