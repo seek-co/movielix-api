@@ -276,15 +276,20 @@ class FavoriteDetailView(APIView):
 class SignUpView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
+        username = request.data.get('username', '').strip()
+        email = request.data.get('email', '').strip()
+        password = request.data.get('password', '').strip()
+
+        if not all([username, email, password]):
+            return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             validate_password(password)
-        except ValidationError as err:
-            return Response({"error": err.messages}, status=400)
+        except ValidationError as error:
+            return Response({'error': error.messages}, status=status.HTTP_400_BAD_REQUEST)
 
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -294,8 +299,8 @@ class SignUpView(APIView):
         tokens = RefreshToken.for_user(user)
         return Response(
             {
-                "refresh": str(tokens),
-                "access": str(tokens.access_token)
+                'refresh': str(tokens),
+                'access': str(tokens.access_token)
             },
             status=status.HTTP_201_CREATED
         )
