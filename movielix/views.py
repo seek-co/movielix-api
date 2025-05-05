@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.db.models import Count
+
 
 
 # Create your views here.
@@ -236,7 +238,7 @@ class FavoriteListView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         favorites = Favorite.objects.filter(user=request.user)
-        serializer = FavoriteSerializer(favorites, many=True)
+        serializer = FavoriteSerializer(favorites, many=True, context={"user": request.user})
         return Response(serializer.data)
 
     def post(self, request):

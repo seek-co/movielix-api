@@ -13,6 +13,7 @@ class TagSerializer(serializers.ModelSerializer):
         
 class CollectionSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
+    movie_count = movie_count = serializers.SerializerMethodField()
     class Meta:
         model = Collection
         fields = '__all__'
@@ -22,6 +23,9 @@ class CollectionSerializer(serializers.ModelSerializer):
         if user and not user.is_anonymous:
             return obj.favorites.filter(user=user).exists()
         return False
+    
+    def get_movie_count(self, obj):
+        return obj.watchlists.count()
         
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
