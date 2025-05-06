@@ -2,39 +2,63 @@
 
 from django.db import migrations
 
-# This code is adapted from the Django documentation, 
+# This code is adapted from the Django documentation,
 # specifically for creating custom migrations and seeding data.
 # URL: https://docs.djangoproject.com/en/5.2/topics/migrations/#data-migrations
+
 
 def seed_tags(apps, schema_editor):
     Tag = apps.get_model("movielix", "Tag")
     tags = [
-        "Must Watch", "Top Rated", "Classic", "Action", "Comedy", "Drama", 
-        "Sci-Fi", "Adventure", "Family", "Horror", "Romance", "Thriller", "Fantasy", "Trending Now", "Popular"
+        "Must Watch",
+        "Top Rated",
+        "Classic",
+        "Action",
+        "Comedy",
+        "Drama",
+        "Sci-Fi",
+        "Adventure",
+        "Family",
+        "Horror",
+        "Romance",
+        "Thriller",
+        "Fantasy",
+        "Trending Now",
+        "Popular",
     ]
 
     for name in tags:
         Tag.objects.get_or_create(name=name)
-        
+
+
 def seed_genres(apps, schema_editor):
-    Genre = apps.get_model("movielix", 'Genre')
+    Genre = apps.get_model("movielix", "Genre")
     genres = [
-        "Action", "Adventure", "Animation", "Biography", "Comedy", "Crime",
-        "Documentary", "Drama", "Family", "Fantasy", "History", "Horror",
-        "Music", "Musical", "Mystery", "Romance", "Science Fiction", "Sport",
-        "Thriller", "War", "Western", "Superhero", "Psychological", "Noir",
-        "Disaster", "Heist", "Post-Apocalyptic", "Cyberpunk", "Time Travel",
-        "Parody", "Political", "Coming of Age", "Martial Arts", "Survival",
-        "Space", "Epic"
+        "Action",
+        "Adventure",
+        "Animation",
+        "Comedy",
+        "Crime",
+        "Documentary",
+        "Drama",
+        "Family",
+        "Fantasy",
+        "History",
+        "Horror",
+        "Mystery",
+        "Romance",
+        "Science Fiction",
+        "Thriller",
+        "War",
     ]
     for name in genres:
         Genre.objects.get_or_create(name=name)
-        
-        
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('movielix', '0001_initial'),
+        ("movielix", "0001_initial"),
     ]
 
     operations = [

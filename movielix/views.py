@@ -17,21 +17,25 @@ from django.db.models import Count
 # Create your views here.
 
 class MovieListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        movies = Movie.objects.all()
+        user_only = request.query_params.get("mine") == "true"
+        if user_only:
+            movies = Movie.objects.filter(added_by=request.user)
+        else:
+            movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         serializer = MovieSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(added_by=self.request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class MovieDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         return get_object_or_404(Movie, pk=pk)
