@@ -37,6 +37,7 @@ class CollectionSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     is_mine = serializers.SerializerMethodField()
     watchlists = WatchlistSerializer(many=True)
+    tags = TagSerializer(many=True)
         
     class Meta:
         model = Collection
