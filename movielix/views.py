@@ -74,7 +74,7 @@ class TagListView(APIView):
 
 
 class TagDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get_object(self, pk):
         return get_object_or_404(Tag, pk=pk)
@@ -104,7 +104,7 @@ class CollectionListView(APIView):
     def get(self, request):
         user = request.user 
         collections = Collection.objects.filter(user=user)
-        serializer = CollectionSerializer(collections, many=True, context={"user": request.user})
+        serializer = CollectionSerializer(collections, many=True, context={"user": user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -116,14 +116,15 @@ class CollectionListView(APIView):
     
     
 class CollectionDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     
     def get_object(self, pk):
         return get_object_or_404(Collection, pk=pk)
     
     def get(self, request, pk):
+        user = request.user 
         collection = self.get_object(pk)
-        serializer = CollectionSerializer(collection)
+        serializer = CollectionSerializer(collection,context={"user": user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, pk):
@@ -140,7 +141,7 @@ class CollectionDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 class GenreListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         genres = Genre.objects.all()
         serializer = GenreSerializer(genres, many=True)
@@ -148,14 +149,14 @@ class GenreListView(APIView):
     
 
 class WatchlistView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         watchlists = Watchlist.objects.all().select_related("movie", "collection")
         serializer = WatchlistSerializer(watchlists, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class WatchlistByCollectionView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, collection_id):
         watchlist = Watchlist.objects.filter(collection_id=collection_id).select_related("movie")
         serializer = WatchlistSerializer(watchlist, many=True)
@@ -177,7 +178,7 @@ class WatchlistByCollectionView(APIView):
 
     
 class WatchlistDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, collection_id, movie_id):
         watchlist = get_object_or_404(
             Watchlist.objects.select_related("movie", "collection"),
@@ -197,7 +198,7 @@ class WatchlistDetailView(APIView):
         
         
 class MovieReviewListView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, movie_id):
         movie = get_object_or_404(Movie, id=movie_id)
         reviews = MovieReview.objects.filter(movie_id=movie_id).select_related("user")
@@ -219,7 +220,7 @@ class MovieReviewListView(APIView):
     
     
 class MovieReviewDetailView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     def get(self, request, movie_id, review_id):
         review = get_object_or_404(MovieReview, id=review_id, movie_id=movie_id)
         serializer = MovieReviewSerializer(review)
