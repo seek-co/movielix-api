@@ -12,7 +12,8 @@ from .serializers import (
     MovieReviewSerializer,
     FavoriteSerializer,
     CollectionCreateSerializer,
-    MovieDetailSerializer
+    MovieDetailSerializer,
+    CollectionPatchSerializer
 )
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -58,7 +59,7 @@ class MovieDetailView(APIView):
 
     def patch(self, request, pk):
         movie = self.get_object(pk)
-        if movie.user != request.user:
+        if movie.added_by != request.user:
             return Response(
                 {"error": "You do not have permission to edit this movie."},
                 status=status.HTTP_403_FORBIDDEN,
@@ -166,7 +167,7 @@ class CollectionDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = CollectionSerializer(collection, data=request.data, partial=True)
+        serializer = CollectionPatchSerializer(collection, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
