@@ -11,7 +11,6 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = '__all__'
         
-        
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
@@ -30,6 +29,11 @@ class MovieReviewSerializer(serializers.ModelSerializer):
         model = MovieReview
         fields = ["id", "user", "username", "rating", "review", "movie", "created_at", "updated_at"]
         read_only_fields = ["movie", "username", "created_at", "updated_at"]
+        
+class CollectionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
+        fields = ['title', 'description', 'tags', 'is_public', 'url']
 
 class CollectionSerializer(serializers.ModelSerializer):
     is_favorite = serializers.SerializerMethodField()
