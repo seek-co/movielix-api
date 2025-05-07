@@ -129,7 +129,10 @@ class CollectionDetailView(APIView):
 
     def patch(self, request, pk):
         collection = self.get_object(pk)
-        serializer = CollectionSerializer(collection, data=request.data)
+        if collection.user != request.user:
+            return Response({"error": "You do not have permission to edit this collection."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = CollectionSerializer(collection, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -137,6 +140,8 @@ class CollectionDetailView(APIView):
 
     def delete(self, request, pk):
         collection = self.get_object(pk)
+        if collection.user != request.user:
+            return Response({"error": "You do not have permission to delete this collection."}, status=status.HTTP_403_FORBIDDEN)
         collection.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
