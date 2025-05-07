@@ -124,6 +124,8 @@ class CollectionDetailView(APIView):
     def get(self, request, pk):
         user = request.user 
         collection = self.get_object(pk)
+        if collection.user != user and not collection.is_public:
+            return Response({"detail": "You do not have permission to view this collection."}, status=status.HTTP_403_FORBIDDEN)
         serializer = CollectionSerializer(collection,context={"user": user})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -236,7 +238,7 @@ class MovieReviewDetailView(APIView):
         serializer = MovieReviewSerializer(review, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, movie_id, review_id):
