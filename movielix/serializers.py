@@ -16,6 +16,19 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = '__all__'
 
+class MovieDetailSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="added_by.username", read_only=True)
+    is_mine = serializers.SerializerMethodField()
+    genres = GenreSerializer(many=True)
+        
+    class Meta:
+        model = Movie
+        fields = '__all__'
+    
+    def get_is_mine(self, obj):
+        user = self.context.get("user")
+        return user == obj.added_by if user and not user.is_anonymous else False
+
 class WatchlistSerializer(serializers.ModelSerializer):
     movie = MovieSerializer()
     class Meta:
