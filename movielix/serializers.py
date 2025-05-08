@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, Tag, Collection, Genre, Watchlist, MovieReview, Favorite
+from .models import Movie, Tag, Collection, Genre, Watchlist, MovieReview, Favorite, MovieStatus
 
 
 class MovieSerializer(serializers.ModelSerializer):
@@ -19,6 +19,19 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = "__all__"
 
+class MovieStatusSerializer(serializers.ModelSerializer):
+    movie_id = serializers.SerializerMethodField()
+    user_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MovieStatus
+        fields = '__all__'
+
+    def get_movie_id(self, obj):
+        return obj.watchlist.movie.id
+
+    def get_user_id(self, obj):
+        return obj.watchlist.collection.user.id
 
 class MovieDetailSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="added_by.username", read_only=True)
@@ -35,11 +48,12 @@ class MovieDetailSerializer(serializers.ModelSerializer):
 
 
 class WatchlistSerializer(serializers.ModelSerializer):
-    movie = MovieSerializer()
+    movie = MovieSerializer(read_only=True)
+    status = MovieStatusSerializer()
 
     class Meta:
         model = Watchlist
-        fields = ["id", "collection", "movie", "created_at", "updated_at"]
+        fields = ["id", "collection", "movie", "status", "created_at", "updated_at"]
 
 
 class MovieReviewSerializer(serializers.ModelSerializer):
