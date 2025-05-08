@@ -22,6 +22,8 @@ class GenreSerializer(serializers.ModelSerializer):
 class MovieStatusSerializer(serializers.ModelSerializer):
     movie_id = serializers.SerializerMethodField()
     user_id = serializers.SerializerMethodField()
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+
 
     class Meta:
         model = MovieStatus
