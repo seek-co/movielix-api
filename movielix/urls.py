@@ -15,6 +15,7 @@ from .views import (
     FavoriteListView,
     FavoriteDetailView,
     WatchlistMovieStatusView,
+    PublicCollectionListView,
     SignUpView,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -27,6 +28,7 @@ urlpatterns = [
     path("watchlist/<int:watchlist_id>/movie/<int:movie_id>", WatchlistMovieStatusView.as_view(), name="watchlist-movie"),
     path("collections/", CollectionListView.as_view(), name="collection-list"),
     path("collections/<int:pk>/", CollectionDetailView.as_view(), name="collection-detail"),
+    path("collections/explore/", PublicCollectionListView.as_view(), name="collection-list"),
     path("tags/", TagListView.as_view(), name="tag-list"),
     path("tags/<int:pk>/", TagDetailView.as_view(), name="tag-detail"),
     path("genres/", GenreListView.as_view(), name="genre-list"),

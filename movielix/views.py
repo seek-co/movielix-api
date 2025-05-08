@@ -400,6 +400,17 @@ class WatchlistMovieStatusView(APIView):
         serializer = WatchlistSerializer(watchlist)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class PublicCollectionListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        collections = Collection.objects.filter(is_public=True)
+        serializer = CollectionSerializer(
+            collections, many=True
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class SignUpView(APIView):
