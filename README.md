@@ -6,7 +6,11 @@
 
 ## Description
 
-Movielix is a full-stack movie watchlist project where users can create and manage collections, add movies with full CRUD functionality, track movie statuses, write reviews, and favorite both their own and others' collections. It’s built with Django, PostgreSQL, React, and Bootstrap.
+Movielix is a full-stack movie watchlist project that allows users to create, edit, and delete movies and collections, add or remove movies in collections, and favorite both personal and public collections.
+
+Built with Django, Django REST Framework (DRF), PostgreSQL, React, Bootstrap, and JWT authentication.
+
+Developed as the capstone project of the SDA x GA SEB bootcamp.
 
 ## Tech Stack
 
@@ -17,7 +21,7 @@ Movielix is a full-stack movie watchlist project where users can create and mana
 
 ## FrontEnd Repo Link
 
-[Movielix Frontend](https://git.generalassemb.ly/mohd-sunbul/movielix-frontend)
+[Movielix Frontend](https://github.com/vMohd/movielix-frontend)
 
 ## ERD Diagram
 
@@ -61,21 +65,6 @@ Movielix is a full-stack movie watchlist project where users can create and mana
 | Add a collection to favorites       | `/favorites/`                     | `/favorites` | POST      | Add a collection to favorites      |
 | Remove a collection from favorites  | `/favorites/<int:collection_id>/` | `/favorites` | DELETE    | Remove a collection from favorites |
 
----
-
-### Tags and Genres
-
-| Purpose             | Server URL        | Client URL | HTTP Verb | Description         |
-| ------------------- | ----------------- | ---------- | --------- | ------------------- |
-| List all tags       | `/tags/`          | N/A        | GET       | List all tags       |
-| Create a new tag    | `/tags/`          | N/A        | POST      | Create a new tag    |
-| View a specific tag | `/tags/<int:pk>/` | N/A        | GET       | View a specific tag |
-| Update a tag        | `/tags/<int:pk>/` | N/A        | PATCH     | Update a tag        |
-| Delete a tag        | `/tags/<int:pk>/` | N/A        | DELETE    | Delete a tag        |
-| List all genres     | `/genres/`        | N/A        | GET       | List all genres     |
-| Create a new genre  | `/genres/`        | N/A        | POST      | Create a new genre  |
-
----
 
 ### User Authentication
 
@@ -94,7 +83,7 @@ Movielix is a full-stack movie watchlist project where users can create and mana
 - As a user, I can update or delete movies from my collections.
 - As a user, I can add notes to movies (date to watch, where to watch, with whom).
 - As a user, I can update and delete movie notes.
-- As a user, I can mark a movie as watched, add a rating (1-10), and write a review.
+- As a user, I can mark a movie as watched, add a rating (1-5), and write a review.
 - As a user, I can update or delete movie statuses (watched details).
 - As a user, I can favorite any public collection.
 - As a user, I can browse public collections in the Explore section.
@@ -110,8 +99,8 @@ To clone the project up and running on your local machine, follow these instruct
 
 #### 1. Clone the repo:
 
-- `git clone https://git.generalassemb.ly/mohd-sunbul/movielix-frontend.git`
-- `git clone https://git.generalassemb.ly/mohd-sunbul/movielix-backend.git`
+- `git clone https://github.com/vMohd/movielix-frontend.git`
+- `git clone https://github.com/vMohd/movielix-backend.git`
 
 #### 2. Install backend dependencies:
 
