@@ -21,7 +21,7 @@ Developed as the capstone project of the SDA x GA SEB bootcamp.
 
 ## FrontEnd Repo Link
 
-[Movielix Frontend](https://github.com/vMohd/movielix-frontend)
+[Movielix Frontend](https://github.com/seek-co/movielix-UI)
 
 ## ERD Diagram
 
